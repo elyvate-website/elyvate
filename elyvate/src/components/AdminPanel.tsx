@@ -665,6 +665,7 @@ export const AdminPanel: React.FC = () => {
                             <option value="Electronics">Electronics</option>
                             <option value="Accessories">Accessories</option>
                             <option value="Bundles">Bundles</option>
+                          </select>
                         </div>
                         <div>
                           <label className="block text-[10px] tracking-wider font-extrabold text-neutral-450 uppercase text-zinc-400 mb-1">Original Price ($)</label>

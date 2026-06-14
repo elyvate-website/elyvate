@@ -47,7 +47,8 @@ create table if not exists hero_section (
   subheadline  text default 'Premium ambient lighting & projection gadgets for your home.',
   cta_text     text default 'Shop Now',
   cta_link     text default '/products',
-  bg_image     text default ''
+  bg_image     text default '',
+  bg_image_mobile text default ''
 );
 
 -- Insert default hero row

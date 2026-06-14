@@ -7,18 +7,30 @@ export default function HeroSection({ hero }: { hero: HeroType | null }) {
   const subheadline = hero?.subheadline ?? 'Premium ambient lighting & projection gadgets that transform any room into an experience.'
   const ctaText     = hero?.cta_text    ?? 'Shop Now'
   const ctaLink     = hero?.cta_link    ?? '/products'
-  const bgImage     = hero?.bg_image    ?? null
+  const bgImage       = hero?.bg_image        ?? null
+  const bgImageMobile = hero?.bg_image_mobile || bgImage
 
   return (
     <section className="relative w-full min-h-screen flex items-center overflow-hidden bg-[#070a0f]">
-      {/* Background image */}
+      {/* Desktop background image */}
       {bgImage && (
         <Image
           src={bgImage}
           alt="Hero background"
           fill
           priority
-          className="object-cover object-center opacity-80"
+          className="hidden sm:block object-cover object-center opacity-80"
+        />
+      )}
+
+      {/* Mobile background image */}
+      {bgImageMobile && (
+        <Image
+          src={bgImageMobile}
+          alt="Hero background"
+          fill
+          priority
+          className="sm:hidden object-cover object-center opacity-80"
         />
       )}
 

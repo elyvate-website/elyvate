@@ -7,32 +7,59 @@ export default function HeroSection({ hero }: { hero: HeroType | null }) {
   const subheadline = hero?.subheadline ?? 'Premium ambient lighting & projection gadgets that transform any room into an experience.'
   const ctaText     = hero?.cta_text    ?? 'Shop Now'
   const ctaLink     = hero?.cta_link    ?? '/products'
+
   const bgImage       = hero?.bg_image        ?? null
   const bgImageMobile = hero?.bg_image_mobile || bgImage
+  const bgVideo       = hero?.bg_video        || null
+  const bgVideoMobile = hero?.bg_video_mobile || bgVideo
 
   return (
-    <section className="relative w-full aspect-square sm:aspect-[16/10] lg:aspect-[21/9] max-h-[680px] overflow-hidden rounded-b-[2rem] sm:rounded-b-[3rem] bg-[#070a0f]">
-      {/* Desktop background image */}
-      {bgImage && (
-        <Image
-          src={bgImage}
-          alt="Hero background"
-          fill
-          priority
-          className="hidden sm:block object-cover object-center"
-        />
-      )}
+    <section className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[24/9] max-h-[520px] overflow-hidden rounded-b-[2rem] sm:rounded-b-[3rem] bg-[#070a0f]">
+      {/* Desktop media */}
+      <div className="hidden sm:block absolute inset-0">
+        {bgVideo ? (
+          <video
+            src={bgVideo}
+            poster={bgImage ?? undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+        ) : bgImage ? (
+          <Image
+            src={bgImage}
+            alt="Hero background"
+            fill
+            priority
+            className="object-cover object-center"
+          />
+        ) : null}
+      </div>
 
-      {/* Mobile background image */}
-      {bgImageMobile && (
-        <Image
-          src={bgImageMobile}
-          alt="Hero background"
-          fill
-          priority
-          className="sm:hidden object-cover object-center"
-        />
-      )}
+      {/* Mobile media */}
+      <div className="sm:hidden absolute inset-0">
+        {bgVideoMobile ? (
+          <video
+            src={bgVideoMobile}
+            poster={bgImageMobile ?? undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+        ) : bgImageMobile ? (
+          <Image
+            src={bgImageMobile}
+            alt="Hero background"
+            fill
+            priority
+            className="object-cover object-center"
+          />
+        ) : null}
+      </div>
 
       {/* Subtle darkening for text legibility */}
       <div className="absolute inset-0 bg-black/25" />

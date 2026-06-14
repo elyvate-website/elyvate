@@ -55,6 +55,8 @@ export type HeroSection = {
   cta_link: string
   bg_image: string
   bg_image_mobile: string | null
+  bg_video: string | null
+  bg_video_mobile: string | null
 }
 
 export type SiteSettings = {

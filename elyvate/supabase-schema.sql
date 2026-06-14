@@ -48,7 +48,9 @@ create table if not exists hero_section (
   cta_text     text default 'Shop Now',
   cta_link     text default '/products',
   bg_image     text default '',
-  bg_image_mobile text default ''
+  bg_image_mobile text default '',
+  bg_video        text default '',
+  bg_video_mobile text default ''
 );
 
 -- Insert default hero row

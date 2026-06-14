@@ -7,6 +7,9 @@ import { supabase, Product } from '@/lib/supabase'
 import { useCart } from '@/lib/cartStore'
 import toast from 'react-hot-toast'
 
+export const dynamic = 'force-dynamic'
+
+
 export default function ProductPage() {
   const { slug } = useParams()
   const [product, setProduct] = useState<Product | null>(null)

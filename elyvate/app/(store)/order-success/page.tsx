@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { CheckCircle } from 'lucide-react'
 import { useCart } from '@/lib/cartStore'
 
+export const dynamic = 'force-dynamic'
+
+
 export default function OrderSuccessPage() {
   const { clearCart } = useCart()
   useEffect(() => { clearCart() }, [])

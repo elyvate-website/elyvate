@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/lib/cartStore'
 
+export const dynamic = 'force-dynamic'
+
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total } = useCart()
 

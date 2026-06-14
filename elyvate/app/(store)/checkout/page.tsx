@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { ShieldCheck, Lock } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
+
 type FormData = {
   name: string; email: string; phone: string
   address: string; city: string; country: string; zip: string

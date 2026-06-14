@@ -3,15 +3,16 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingBag,
-  Image as ImageIcon, Settings, ExternalLink, LogOut
+  Image as ImageIcon, Settings, ExternalLink, LogOut, Tag
 } from 'lucide-react'
 
 const nav = [
   { href: '/admin',          icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/products', icon: Package,         label: 'Products' },
   { href: '/admin/orders',   icon: ShoppingBag,     label: 'Orders' },
-  { href: '/admin/hero',     icon: ImageIcon,        label: 'Hero Section' },
-  { href: '/admin/settings', icon: Settings,         label: 'Settings' },
+  { href: '/admin/coupons',  icon: Tag,             label: 'Coupons' },
+  { href: '/admin/hero',     icon: ImageIcon,       label: 'Hero Section' },
+  { href: '/admin/settings', icon: Settings,        label: 'Settings' },
 ]
 
 export default function AdminSidebar() {

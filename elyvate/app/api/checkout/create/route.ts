@@ -3,15 +3,15 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
   try {
-    const { form, items, total } = await req.json()
+    const { form, items, total, couponCode, discountAmount } = await req.json()
 
-    // Build a combined product name for multi-item orders
     const productName = items.map((i: { name: string; quantity: number }) =>
       `${i.name} × ${i.quantity}`
     ).join(', ')
 
-    // Save order to Supabase
     const db = supabaseAdmin()
+
+    // Save order to Supabase (now includes coupon fields)
     const { data: order, error } = await db
       .from('orders')
       .insert({
@@ -28,19 +28,42 @@ export async function POST(req: NextRequest) {
         total_price:      total,
         payment_status:   'pending',
         order_status:     'processing',
+        coupon_code:      couponCode ?? null,
+        discount_amount:  discountAmount ?? 0,
       })
       .select()
       .single()
 
     if (error) throw error
 
-    // Build 2Checkout redirect URL
-    const sellerId   = process.env.TWOCHECKOUT_SELLER_ID
-    const appUrl     = process.env.NEXT_PUBLIC_APP_URL
-    const returnUrl  = encodeURIComponent(`${appUrl}/order-success?order=${order.id}`)
-    const cancelUrl  = encodeURIComponent(`${appUrl}/checkout`)
+    // Increment coupon usage count if a coupon was applied
+    if (couponCode) {
+      await db
+        .from('coupons')
+        .update({ usage_count: db.rpc('increment', { x: 1 }) as unknown as number })
+        .eq('code', couponCode.toUpperCase())
 
-    // 2Checkout inline purchase link
+      // Simpler fallback — fetch current count then update
+      const { data: coupon } = await db
+        .from('coupons')
+        .select('usage_count')
+        .eq('code', couponCode.toUpperCase())
+        .single()
+
+      if (coupon) {
+        await db
+          .from('coupons')
+          .update({ usage_count: coupon.usage_count + 1 })
+          .eq('code', couponCode.toUpperCase())
+      }
+    }
+
+    // Build 2Checkout redirect URL
+    const sellerId  = process.env.TWOCHECKOUT_SELLER_ID
+    const appUrl    = process.env.NEXT_PUBLIC_APP_URL
+    const returnUrl = encodeURIComponent(`${appUrl}/order-success?order=${order.id}`)
+    const cancelUrl = encodeURIComponent(`${appUrl}/checkout`)
+
     const paymentUrl =
       `https://secure.2checkout.com/order/checkout.php` +
       `?PRODS=` + items.map((i: { id: string }) => i.id).join(',') +

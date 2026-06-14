@@ -14,7 +14,7 @@ export default function HeroSection({ hero }: { hero: HeroType | null }) {
   const bgVideoMobile = hero?.bg_video_mobile || bgVideo
 
   return (
-    <section className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[24/9] max-h-[520px] overflow-hidden rounded-b-[2rem] sm:rounded-b-[3rem] bg-[#070a0f]">
+    <section className="relative w-full aspect-[5/6] sm:aspect-[16/10] lg:aspect-[21/9] max-h-[620px] overflow-hidden rounded-b-[2rem] sm:rounded-b-[3rem] bg-[#070a0f]">
       {/* Desktop media */}
       <div className="hidden sm:block absolute inset-0">
         {bgVideo ? (

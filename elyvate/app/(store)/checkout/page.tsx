@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/lib/cartStore'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -16,15 +16,27 @@ type FormData = {
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState<FormData>({
     name: '', email: '', phone: '',
     address: '', city: '', country: '', zip: '',
   })
 
-  if (items.length === 0) {
-    router.push('/cart')
-    return null
+  useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    if (mounted && items.length === 0) {
+      router.push('/cart')
+    }
+  }, [mounted, items.length, router])
+
+  if (!mounted || items.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   const update = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>

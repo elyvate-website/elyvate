@@ -21,6 +21,23 @@ cp .env.local.example .env.local
 - Anon Key → Settings → API → anon public
 - Service Role Key → Settings → API → service_role secret
 
+## 4a. Admin Panel Login (IMPORTANT)
+Set `ADMIN_SECRET` in your `.env.local` (and in Vercel env vars) to a strong password — this is the password you'll use to log into `/admin`.
+
+```env
+ADMIN_SECRET=choose_a_strong_password_here
+```
+
+Visit `/admin` → you'll be redirected to `/admin-login` → enter your `ADMIN_SECRET` value as the password.
+
+## 4b. Storage Bucket (REQUIRED for image uploads)
+1. Supabase Dashboard → Storage → **New Bucket**
+2. Name it exactly: `product-images`
+3. Toggle **Public bucket: ON**
+4. Click Create
+
+Without this bucket, image uploads in the admin panel will fail.
+
 ## 5. Resend Setup
 1. Sign up at resend.com (free)
 2. Add your domain or use their test email

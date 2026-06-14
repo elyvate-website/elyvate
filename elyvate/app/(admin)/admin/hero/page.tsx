@@ -20,26 +20,40 @@ export default function AdminHero() {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const path = `hero/${Date.now()}.${file.name.split('.').pop()}`
-    const { error } = await supabase.storage.from('product-images').upload(path, file, { upsert: true })
-    if (!error) {
-      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(path)
-      setHero(h => ({ ...h, bg_image: publicUrl }))
+
+    const formData = new FormData()
+    formData.append('files', file)
+    formData.append('folder', 'hero')
+
+    try {
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      setHero(h => ({ ...h, bg_image: data.urls[0] }))
       toast.success('Image uploaded!')
-    } else toast.error('Upload failed')
-    setUploading(false)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function handleSave() {
     setSaving(true)
-    const { data: existing } = await supabase.from('hero_section').select('id').single()
-    if (existing?.id) {
-      await supabase.from('hero_section').update(hero).eq('id', existing.id)
-    } else {
-      await supabase.from('hero_section').insert(hero)
+    try {
+      const res = await fetch('/api/admin/hero', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(hero),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Save failed')
+      toast.success('Hero section saved!')
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Save failed')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    toast.success('Hero section saved!')
   }
 
   return (

@@ -32,18 +32,21 @@ export default function AdminProducts() {
     const files = Array.from(e.target.files ?? [])
     if (!files.length) return
     setUploading(true)
-    const urls: string[] = []
-    for (const file of files) {
-      const ext  = file.name.split('.').pop()
-      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { error } = await supabase.storage.from('product-images').upload(path, file)
-      if (!error) {
-        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(path)
-        urls.push(publicUrl)
-      }
+
+    const formData = new FormData()
+    files.forEach(f => formData.append('files', f))
+    formData.append('folder', 'products')
+
+    try {
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      setEditing(prev => ({ ...prev, images: [...(prev.images ?? []), ...data.urls] }))
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploading(false)
     }
-    setEditing(e => ({ ...e, images: [...(e.images ?? []), ...urls] }))
-    setUploading(false)
   }
 
   function removeImage(idx: number) {
@@ -54,23 +57,32 @@ export default function AdminProducts() {
     if (!editing.name || !editing.slug || !editing.price) {
       toast.error('Name, slug and price are required'); return
     }
-    const payload = { ...editing }
-    if (editing.id) {
-      const { error } = await supabase.from('products').update(payload).eq('id', editing.id)
-      if (error) { toast.error('Update failed'); return }
-      toast.success('Product updated!')
-    } else {
-      const { error } = await supabase.from('products').insert(payload)
-      if (error) { toast.error('Create failed'); return }
-      toast.success('Product added!')
+    try {
+      const isEdit = !!editing.id
+      const res = await fetch('/api/admin/products', {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editing),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Save failed')
+      toast.success(isEdit ? 'Product updated!' : 'Product added!')
+      setModal(false); load()
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Save failed')
     }
-    setModal(false); load()
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this product?')) return
-    await supabase.from('products').delete().eq('id', id)
-    toast.success('Deleted'); load()
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Delete failed')
+      toast.success('Deleted'); load()
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Delete failed')
+    }
   }
 
   function slugify(name: string) {

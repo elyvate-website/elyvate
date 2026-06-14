@@ -1,9 +1,9 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingBag,
-  Image as ImageIcon, Settings, ExternalLink
+  Image as ImageIcon, Settings, ExternalLink, LogOut
 } from 'lucide-react'
 
 const nav = [
@@ -16,6 +16,13 @@ const nav = [
 
 export default function AdminSidebar() {
   const path = usePathname()
+  const router = useRouter()
+
+  async function handleLogout() {
+    await fetch('/api/admin/auth', { method: 'DELETE' })
+    router.push('/admin-login')
+    router.refresh()
+  }
 
   return (
     <aside className="w-60 shrink-0 bg-white border-r border-surface-200 min-h-screen flex flex-col">
@@ -46,8 +53,8 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      {/* View store */}
-      <div className="p-3 border-t border-surface-200">
+      {/* View store + logout */}
+      <div className="p-3 border-t border-surface-200 space-y-1">
         <a
           href="/"
           target="_blank"
@@ -56,6 +63,13 @@ export default function AdminSidebar() {
           <ExternalLink size={17} />
           View Store
         </a>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-ink-secondary hover:bg-red-50 hover:text-red-600 transition-colors"
+        >
+          <LogOut size={17} />
+          Log Out
+        </button>
       </div>
     </aside>
   )

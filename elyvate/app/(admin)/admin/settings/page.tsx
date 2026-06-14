@@ -14,14 +14,20 @@ export default function AdminSettings() {
 
   async function handleSave() {
     setSaving(true)
-    const { data: existing } = await supabase.from('site_settings').select('id').single()
-    if (existing?.id) {
-      await supabase.from('site_settings').update(settings).eq('id', existing.id)
-    } else {
-      await supabase.from('site_settings').insert(settings)
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Save failed')
+      toast.success('Settings saved!')
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Save failed')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    toast.success('Settings saved!')
   }
 
   const update = (k: keyof SiteSettings) => (e: React.ChangeEvent<HTMLInputElement>) =>

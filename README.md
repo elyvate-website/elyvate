@@ -1,2 +1,0 @@
-# elyvate
-A online shop

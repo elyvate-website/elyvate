@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { getAdminSession } from '@/lib/adminAuth'
+import { isAdminAuthed } from '@/lib/adminAuth'
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -8,7 +8,7 @@ function unauthorized() {
 
 // GET — list all coupons
 export async function GET(req: NextRequest) {
-  if (!getAdminSession(req)) return unauthorized()
+  if (!isAdminAuthed(req)) return unauthorized()
 
   const db = supabaseAdmin()
   const { data, error } = await db
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
 // POST — create coupon
 export async function POST(req: NextRequest) {
-  if (!getAdminSession(req)) return unauthorized()
+  if (!isAdminAuthed(req)) return unauthorized()
 
   try {
     const body = await req.json()
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH — toggle active or update
 export async function PATCH(req: NextRequest) {
-  if (!getAdminSession(req)) return unauthorized()
+  if (!isAdminAuthed(req)) return unauthorized()
 
   try {
     const body = await req.json()
@@ -94,7 +94,7 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE — remove coupon
 export async function DELETE(req: NextRequest) {
-  if (!getAdminSession(req)) return unauthorized()
+  if (!isAdminAuthed(req)) return unauthorized()
 
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')

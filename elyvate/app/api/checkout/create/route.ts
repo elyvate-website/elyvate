@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     const db = supabaseAdmin()
 
-    // Save order to Supabase (now includes coupon fields)
+    // Save order to Supabase
     const { data: order, error } = await db
       .from('orders')
       .insert({
@@ -38,12 +38,6 @@ export async function POST(req: NextRequest) {
 
     // Increment coupon usage count if a coupon was applied
     if (couponCode) {
-      await db
-        .from('coupons')
-        .update({ usage_count: db.rpc('increment', { x: 1 }) as unknown as number })
-        .eq('code', couponCode.toUpperCase())
-
-      // Simpler fallback — fetch current count then update
       const { data: coupon } = await db
         .from('coupons')
         .select('usage_count')

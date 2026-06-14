@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import { AuthProvider } from '@/lib/authContext'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -25,8 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${dmSans.variable} ${playfair.variable}`}>
       <body className="font-body bg-white text-ink-primary antialiased">
-        <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
-        {children}
+        <AuthProvider>
+          <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

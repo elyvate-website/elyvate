@@ -1,9 +1,25 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+// Server-side / shared read-only client (no auth session)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Browser client — singleton, keeps auth session in localStorage
+let _browserClient: ReturnType<typeof createClient> | null = null
+export function supabaseBrowser() {
+  if (!_browserClient) {
+    _browserClient = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
+  }
+  return _browserClient
+}
 
 // Server-side admin client (never expose to frontend)
 export const supabaseAdmin = () =>
@@ -11,7 +27,8 @@ export const supabaseAdmin = () =>
     auth: { autoRefreshToken: false, persistSession: false },
   })
 
-// Types
+// ─── Types ──────────────────────────────────────────────────────────────────
+
 export type Product = {
   id: string
   name: string
@@ -44,6 +61,8 @@ export type Order = {
   payment_status: 'pending' | 'paid' | 'failed'
   order_status: 'processing' | 'fulfilled' | 'shipped' | 'delivered' | 'cancelled'
   twocheckout_ref: string | null
+  coupon_code: string | null
+  discount_amount: number
   created_at: string
 }
 

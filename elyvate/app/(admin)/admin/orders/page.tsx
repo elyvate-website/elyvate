@@ -171,7 +171,7 @@ export default function AdminOrders() {
                           <p className="text-ink-secondary">Product: <span className="text-ink-primary font-medium">{o.product_name}</span></p>
                           <p className="text-ink-secondary">Qty: <span className="text-ink-primary font-medium">{o.quantity}</span></p>
                           <p className="text-ink-secondary">Total: <span className="text-ink-primary font-bold">${o.total_price.toFixed(2)}</span></p>
-                          {(o as unknown as Record<string, unknown>).coupon_code && <p className="text-green-600 text-xs">Coupon: {String((o as unknown as Record<string, unknown>).coupon_code)}</p>}
+                          {o.coupon_code && <p className="text-green-600 text-xs">Coupon: {o.coupon_code}</p>}
                         </div>
                       </div>
                     </div>

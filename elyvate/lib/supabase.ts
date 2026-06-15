@@ -60,6 +60,11 @@ export type Order = {
   total_price: number
   payment_status: 'pending' | 'paid' | 'failed'
   order_status: 'processing' | 'fulfilled' | 'shipped' | 'delivered' | 'cancelled'
+  tracking_number: string | null
+  tracking_carrier: string | null
+  supplier_order_id: string | null
+  notes: string | null
+  fulfilled_at: string | null
   twocheckout_ref: string | null
   coupon_code: string | null
   discount_amount: number

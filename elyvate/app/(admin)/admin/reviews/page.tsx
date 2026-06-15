@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Star, CheckCircle, Trash2, Clock } from 'lucide-react'
-import { supabaseAdmin } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
 type Review = { id: string; product_id: string; author_name: string; rating: number; body: string; is_approved: boolean; created_at: string }

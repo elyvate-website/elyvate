@@ -201,7 +201,7 @@ export default function AdminOrders() {
                         {o.tracking_number ? (
                           <div className="space-y-2 mb-4 p-3 bg-blue-50 rounded-xl">
                             <p className="text-xs font-semibold text-blue-800">Already Shipped</p>
-                            <p className="text-sm font-mono text-blue-700">{o.tracking_number} <span className="text-xs text-blue-500">via {(o as unknown as Record<string, unknown>).tracking_carrier as string}</span></p>
+                            <p className="text-sm font-mono text-blue-700">{o.tracking_number} <span className="text-xs text-blue-500">via {o.tracking_carrier}</span></p>
                           </div>
                         ) : null}
 

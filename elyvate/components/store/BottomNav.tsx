@@ -1,11 +1,9 @@
 'use client'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { useCart } from '@/lib/cartStore'
 import { useAuth } from '@/lib/authContext'
 
-// Each tab has an outlined SVG (inactive) and a filled SVG (active)
-// Custom inline SVGs give us true outline vs filled — lucide-react doesn't do this well
 const tabs = [
   {
     href: '/',
@@ -18,7 +16,6 @@ const tabs = [
     inactive: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 12L12 3l9 9"/>
-        <path d="M9 21V12h6v9"/>
         <path d="M3 12v9h5v-6h6v6h5v-9"/>
       </svg>
     ),
@@ -28,13 +25,12 @@ const tabs = [
     label: 'Products',
     active: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 7.5M17 13l1.5 7.5M9 20.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm7.5 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="2" y="3" width="5" height="5" rx="0.5"/>
-        <rect x="9.5" y="3" width="5" height="5" rx="0.5"/>
-        <rect x="17" y="3" width="5" height="5" rx="0.5"/>
-        <rect x="2" y="10.5" width="5" height="5" rx="0.5"/>
-        <rect x="9.5" y="10.5" width="5" height="5" rx="0.5"/>
-        <rect x="17" y="10.5" width="5" height="5" rx="0.5"/>
+        <rect x="2" y="3" width="5" height="5" rx="1"/>
+        <rect x="9.5" y="3" width="5" height="5" rx="1"/>
+        <rect x="17" y="3" width="5" height="5" rx="1"/>
+        <rect x="2" y="10.5" width="5" height="5" rx="1"/>
+        <rect x="9.5" y="10.5" width="5" height="5" rx="1"/>
+        <rect x="17" y="10.5" width="5" height="5" rx="1"/>
       </svg>
     ),
     inactive: (
@@ -67,14 +63,14 @@ const tabs = [
     isCart: true,
     active: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-17-16v2h2l3.6 7.59-1.35 2.44C3.74 14.72 4.48 16 5.62 16H19v-2H6.42c-.14 0-.25-.11-.25-.25l.03-.12L7.1 12h8.45c.75 0 1.41-.41 1.75-1.03L20.7 5H5.21l-.94-3H1z"/>
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.44C4.74 14.72 5.48 16 6.62 16H19v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 12h8.45c.75 0 1.41-.41 1.75-1.03L21.7 5H6.21L5.27 2H1z"/>
       </svg>
     ),
     inactive: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <path d="M16 10a4 4 0 0 1-8 0"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        <circle cx="10" cy="20.5" r="1.5"/>
+        <circle cx="18" cy="20.5" r="1.5"/>
       </svg>
     ),
   },
@@ -97,75 +93,94 @@ const tabs = [
 ]
 
 export default function BottomNav() {
-  const pathname  = usePathname()
-  const { items } = useCart()
-  const { user }  = useAuth()
-  const cartCount = items.reduce((a, b) => a + b.quantity, 0)
+  const pathname   = usePathname()
+  const router     = useRouter()
+  const { items }  = useCart()
+  const { user }   = useAuth()
+  const cartCount  = items.reduce((a, b) => a + b.quantity, 0)
 
-  function isActive(href: string) {
-    if (href === '/') return pathname === '/'
-    return pathname.startsWith(href)
-  }
+  // Track which tab was JUST tapped — for instant icon swap before route settles
+  const [tapped, setTapped] = useState<string | null>(null)
+  // Track which tab just became active — for triggering the bounce animation
+  const [animating, setAnimating] = useState<string | null>(null)
 
-  function resolveHref(tab: typeof tabs[number]) {
+  // When real pathname changes, clear the tapped state
+  useEffect(() => { setTapped(null) }, [pathname])
+
+  function getActiveHref(tab: typeof tabs[number]) {
     if (tab.isAccount) return user ? '/account' : '/account/login'
     return tab.href
   }
 
+  function isActive(tab: typeof tabs[number]) {
+    const current = tapped ?? (tab.href === '/' ? (pathname === '/' ? '/' : null) : pathname.startsWith(tab.href) ? tab.href : null)
+    if (tapped) return tapped === tab.href
+    if (tab.href === '/') return pathname === '/'
+    return pathname.startsWith(tab.href)
+  }
+
+  function handleTap(tab: typeof tabs[number]) {
+    const href = getActiveHref(tab)
+    const alreadyActive = isActive(tab)
+    if (!alreadyActive) {
+      setTapped(tab.href)
+      setAnimating(tab.href)
+      // Clear animation key after it plays so it can re-trigger next time
+      setTimeout(() => setAnimating(null), 450)
+    }
+    router.push(href)
+  }
+
   return (
     <>
-      {/* Spacer so page content sits above the nav — only on mobile */}
-      <div className="md:hidden h-[env(safe-area-inset-bottom,0px)]" />
-
       <nav
         className="md:hidden fixed bottom-0 inset-x-0 z-50"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        {/* Frosted glass background */}
-        <div className="bg-white/90 backdrop-blur-xl border-t border-black/[0.06] shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <div className="flex items-center justify-around h-16 px-2">
+        <div className="bg-white/92 backdrop-blur-xl border-t border-black/[0.06] shadow-[0_-4px_24px_rgba(0,0,0,0.07)]">
+          <div className="flex items-center justify-around h-[62px] px-1">
             {tabs.map((tab) => {
-              const active = isActive(tab.href)
-              const href   = resolveHref(tab)
+              const active = isActive(tab)
+              const isAnimating = animating === tab.href
 
               return (
-                <Link
+                <button
                   key={tab.href}
-                  href={href}
-                  className="relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full select-none"
+                  onClick={() => handleTap(tab)}
+                  className="relative flex flex-col items-center justify-center gap-[3px] flex-1 h-full select-none outline-none"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* Icon wrapper with active bubble */}
+                  {/* Icon container */}
                   <div className="relative flex items-center justify-center">
-                    {/* Active pill background */}
+
+                    {/* Active glow pill */}
                     <span
-                      className={`absolute inset-0 rounded-2xl transition-all duration-300 ease-out ${
-                        active
-                          ? 'bg-brand-600/10 scale-100 opacity-100'
-                          : 'scale-75 opacity-0'
-                      }`}
-                      style={{ margin: '-6px -12px' }}
+                      className="absolute rounded-2xl transition-all duration-300 ease-out"
+                      style={{
+                        inset: '-5px -14px',
+                        background: active ? 'rgba(99,102,241,0.1)' : 'transparent',
+                        transform: active ? 'scale(1)' : 'scale(0.7)',
+                        opacity: active ? 1 : 0,
+                      }}
                     />
 
-                    {/* Icon with lift animation */}
+                    {/* Icon — instantly switches, then bounces */}
                     <span
-                      className={`relative transition-all duration-300 ease-out ${
-                        active
-                          ? 'text-brand-600 -translate-y-0.5 scale-110'
-                          : 'text-ink-muted scale-100 translate-y-0'
-                      }`}
+                      key={`${tab.href}-${active}`} // re-mount to retrigger animation
+                      className={`relative ${active ? 'text-brand-600' : 'text-ink-muted'} ${isAnimating ? 'nav-icon-active' : active ? 'nav-icon-idle' : ''}`}
+                      style={active && !isAnimating ? { transform: 'translateY(-2px) scale(1.1)' } : undefined}
                     >
                       {active ? tab.active : tab.inactive}
                     </span>
 
                     {/* Cart badge */}
                     {tab.isCart && cartCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                      <span className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none z-10">
                         {cartCount > 9 ? '9+' : cartCount}
                       </span>
                     )}
 
-                    {/* Account dot for logged-in users */}
+                    {/* Online dot for logged-in account */}
                     {tab.isAccount && user && !active && (
                       <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white" />
                     )}
@@ -173,20 +188,21 @@ export default function BottomNav() {
 
                   {/* Label */}
                   <span
-                    className={`text-[10px] tracking-wide transition-all duration-300 ${
-                      active
-                        ? 'text-brand-600 font-semibold'
-                        : 'text-ink-muted font-medium'
+                    className={`text-[10px] tracking-wide transition-colors duration-200 ${
+                      active ? 'text-brand-600 font-semibold nav-label-active' : 'text-ink-muted font-medium'
                     }`}
                   >
                     {tab.label}
                   </span>
-                </Link>
+                </button>
               )
             })}
           </div>
         </div>
       </nav>
+
+      {/* Spacer so page content clears the nav bar */}
+      <div className="md:hidden h-[calc(62px+env(safe-area-inset-bottom,0px))]" />
     </>
   )
 }

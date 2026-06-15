@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Search, X, SlidersHorizontal } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { supabaseBrowser } from '@/lib/supabase'
 import type { Product } from '@/lib/supabase'
 import ProductCard from '@/components/store/ProductCard'
@@ -10,11 +10,10 @@ export default function SearchPage() {
   const [results, setResults]   = useState<Product[]>([])
   const [loading, setLoading]   = useState(false)
   const [searched, setSearched] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef    = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Auto-focus search input on mount
-  useEffect(() => { inputRef.current?.focus() }, [])
+  // NO auto-focus — user taps the field when they're ready
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -47,7 +46,7 @@ export default function SearchPage() {
     <div className="section-pad pt-24 pb-8">
       <div className="container-xl max-w-4xl">
 
-        {/* Search bar */}
+        {/* Search bar — user taps it manually */}
         <div className="relative mb-8">
           <Search
             size={20}
@@ -58,12 +57,12 @@ export default function SearchPage() {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search for galaxy projectors, home decor…"
+            placeholder="Search galaxy projectors, home decor…"
             className="w-full pl-12 pr-12 py-4 rounded-2xl border border-surface-300 bg-white text-ink-primary placeholder:text-ink-muted text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent shadow-card transition-all"
           />
           {query && (
             <button
-              onClick={() => { setQuery(''); inputRef.current?.focus() }}
+              onClick={() => { setQuery(''); inputRef.current?.blur() }}
               className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-surface-100 text-ink-muted hover:text-ink-primary transition-colors"
             >
               <X size={16} />
@@ -81,14 +80,12 @@ export default function SearchPage() {
         {/* Results */}
         {!loading && searched && (
           <div>
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-sm text-ink-secondary">
-                {results.length > 0
-                  ? <><span className="font-semibold text-ink-primary">{results.length}</span> result{results.length !== 1 ? 's' : ''} for "<span className="font-medium text-brand-600">{query}</span>"</>
-                  : <>No results for "<span className="font-medium">{query}</span>"</>
-                }
-              </p>
-            </div>
+            <p className="text-sm text-ink-secondary mb-5">
+              {results.length > 0
+                ? <><span className="font-semibold text-ink-primary">{results.length}</span> result{results.length !== 1 ? 's' : ''} for "<span className="font-medium text-brand-600">{query}</span>"</>
+                : <>No results for "<span className="font-medium">{query}</span>"</>
+              }
+            </p>
 
             {results.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -106,7 +103,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Empty state — before any search */}
+        {/* Empty state */}
         {!loading && !searched && (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -116,7 +113,7 @@ export default function SearchPage() {
               Find your perfect piece
             </h2>
             <p className="text-sm text-ink-secondary max-w-xs mx-auto">
-              Search by product name, category, or description to discover what you're looking for.
+              Tap the search bar above to start searching.
             </p>
           </div>
         )}

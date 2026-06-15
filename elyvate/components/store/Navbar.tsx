@@ -1,10 +1,13 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { ShoppingCart, User, LogOut, Package, ChevronDown, Menu, X } from 'lucide-react'
 import { useCart } from '@/lib/cartStore'
 import { useAuth } from '@/lib/authContext'
+
+// Pages where navbar is always solid (no transparent hero)
+const SOLID_PAGES = ['/products', '/search', '/cart', '/checkout', '/account', '/track-order', '/contact', '/shipping-policy', '/returns-policy', '/privacy-policy']
 
 export default function Navbar() {
   const [scrolled, setScrolled]        = useState(false)
@@ -13,8 +16,12 @@ export default function Navbar() {
   const { items } = useCart()
   const { user, loading, signOut } = useAuth()
   const router      = useRouter()
+  const pathname    = usePathname()
   const userMenuRef = useRef<HTMLDivElement>(null)
   const count       = items.reduce((a, b) => a + b.quantity, 0)
+
+  // Force solid on pages that don't have a hero background
+  const alwaysSolid = SOLID_PAGES.some(p => pathname.startsWith(p))
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -33,7 +40,7 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const light = scrolled || menuOpen
+  const light = scrolled || menuOpen || alwaysSolid
 
   async function handleSignOut() {
     setUserMenuOpen(false)

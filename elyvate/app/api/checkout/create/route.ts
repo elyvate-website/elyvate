@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendAdminOrderNotification, sendCustomerConfirmation } from '@/lib/resend'
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,6 +51,18 @@ export async function POST(req: NextRequest) {
           .update({ usage_count: coupon.usage_count + 1 })
           .eq('code', couponCode.toUpperCase())
       }
+    }
+
+    // Send notification emails — fire immediately when the order is created,
+    // not after payment, so admin always knows about every checkout attempt.
+    // Wrapped so a failed email never blocks the customer's checkout flow.
+    try {
+      await Promise.all([
+        sendAdminOrderNotification(order),
+        sendCustomerConfirmation(order),
+      ])
+    } catch (emailErr) {
+      console.error('Order created but email failed to send:', emailErr)
     }
 
     // Build 2Checkout redirect URL

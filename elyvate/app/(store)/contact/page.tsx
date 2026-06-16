@@ -28,7 +28,7 @@ export default function ContactPage() {
   }
 
   if (sent) return (
-    <div className="min-h-screen flex items-center justify-center section-pad py-20">
+    <div className="min-h-screen flex items-center justify-center section-pad pt-28 pb-20">
       <div className="text-center max-w-sm">
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <Mail size={28} className="text-green-600" />

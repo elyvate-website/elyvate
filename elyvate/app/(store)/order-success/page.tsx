@@ -46,7 +46,7 @@ function OrderSuccessContent() {
 
 export default function OrderSuccessPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center section-pad py-20">
+    <div className="min-h-screen flex items-center justify-center section-pad pt-28 pb-20">
       <Suspense fallback={
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin mx-auto" />

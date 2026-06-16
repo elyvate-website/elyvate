@@ -26,7 +26,7 @@ export default function CartPage() {
   }
 
   if (items.length === 0) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 section-pad pt-28">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 section-pad pt-28 pb-20">
       <ShoppingBag size={48} className="text-surface-300" />
       <h2 className="font-display text-2xl text-ink-primary">Your cart is empty</h2>
       <p className="text-ink-secondary text-sm">Add some products to get started.</p>

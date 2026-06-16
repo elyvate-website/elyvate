@@ -43,7 +43,7 @@ export default function SearchPage() {
   }, [query])
 
   return (
-    <div className="section-pad pt-24 pb-8">
+    <div className="section-pad pt-24 pb-20">
       <div className="container-xl max-w-4xl">
 
         {/* Search bar — user taps it manually */}

@@ -34,6 +34,7 @@ export type Product = {
   name: string
   slug: string
   description: string
+  bullet_points: string[]
   price: number
   compare_price: number | null
   images: string[]

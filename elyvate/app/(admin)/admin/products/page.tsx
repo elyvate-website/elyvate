@@ -1,22 +1,24 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { supabase, Product } from '@/lib/supabase'
-import { Plus, Pencil, Trash2, X, Upload, Star } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Upload, Star, GripVertical, CheckCircle2 } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 
 const EMPTY: Partial<Product> = {
-  name: '', slug: '', description: '', price: 0, compare_price: null,
-  images: [], category: '', stock_status: 'in_stock', is_featured: false,
-  rating: 0, review_count: 0,
+  name: '', slug: '', description: '', bullet_points: [],
+  price: 0, compare_price: null, images: [], category: '',
+  stock_status: 'in_stock', is_featured: false, rating: 0, review_count: 0,
 }
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [modal, setModal] = useState(false)
-  const [editing, setEditing] = useState<Partial<Product>>(EMPTY)
+  const [products, setProducts]   = useState<Product[]>([])
+  const [modal, setModal]         = useState(false)
+  const [editing, setEditing]     = useState<Partial<Product>>(EMPTY)
   const [uploading, setUploading] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
+  const [newBullet, setNewBullet] = useState('')
+  const fileRef    = useRef<HTMLInputElement>(null)
+  const bulletRef  = useRef<HTMLInputElement>(null)
 
   const load = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
@@ -25,34 +27,63 @@ export default function AdminProducts() {
 
   useEffect(() => { load() }, [])
 
-  function openNew() { setEditing(EMPTY); setModal(true) }
-  function openEdit(p: Product) { setEditing({ ...p }); setModal(true) }
+  function openNew() { setEditing(EMPTY); setNewBullet(''); setModal(true) }
+  function openEdit(p: Product) { setEditing({ ...p, bullet_points: p.bullet_points ?? [] }); setNewBullet(''); setModal(true) }
 
+  // ── Bullet helpers ────────────────────────────────────────────
+  function addBullet() {
+    const text = newBullet.trim()
+    if (!text) return
+    setEditing(e => ({ ...e, bullet_points: [...(e.bullet_points ?? []), text] }))
+    setNewBullet('')
+    bulletRef.current?.focus()
+  }
+
+  function removeBullet(idx: number) {
+    setEditing(e => ({ ...e, bullet_points: (e.bullet_points ?? []).filter((_, i) => i !== idx) }))
+  }
+
+  function editBullet(idx: number, val: string) {
+    setEditing(e => {
+      const arr = [...(e.bullet_points ?? [])]
+      arr[idx] = val
+      return { ...e, bullet_points: arr }
+    })
+  }
+
+  function moveBullet(idx: number, dir: -1 | 1) {
+    setEditing(e => {
+      const arr = [...(e.bullet_points ?? [])]
+      const swap = idx + dir
+      if (swap < 0 || swap >= arr.length) return e;
+      [arr[idx], arr[swap]] = [arr[swap], arr[idx]]
+      return { ...e, bullet_points: arr }
+    })
+  }
+
+  // ── Image upload ──────────────────────────────────────────────
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     if (!files.length) return
     setUploading(true)
-
     const formData = new FormData()
     files.forEach(f => formData.append('files', f))
     formData.append('folder', 'products')
-
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+      const res  = await fetch('/api/admin/upload', { method: 'POST', body: formData })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Upload failed')
       setEditing(prev => ({ ...prev, images: [...(prev.images ?? []), ...data.urls] }))
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Upload failed')
-    } finally {
-      setUploading(false)
-    }
+    } finally { setUploading(false) }
   }
 
   function removeImage(idx: number) {
     setEditing(e => ({ ...e, images: (e.images ?? []).filter((_, i) => i !== idx) }))
   }
 
+  // ── Save ──────────────────────────────────────────────────────
   async function handleSave() {
     if (!editing.name || !editing.slug || !editing.price) {
       toast.error('Name, slug and price are required'); return
@@ -62,7 +93,7 @@ export default function AdminProducts() {
       const res = await fetch('/api/admin/products', {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editing),
+        body: JSON.stringify({ ...editing, bullet_points: editing.bullet_points ?? [] }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Save failed')
@@ -76,7 +107,7 @@ export default function AdminProducts() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this product?')) return
     try {
-      const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' })
+      const res  = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Delete failed')
       toast.success('Deleted'); load()
@@ -88,6 +119,8 @@ export default function AdminProducts() {
   function slugify(name: string) {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
   }
+
+  const bullets = editing.bullet_points ?? []
 
   return (
     <div>
@@ -127,15 +160,18 @@ export default function AdminProducts() {
                         <div>
                           <p className="font-medium text-ink-primary">{p.name}</p>
                           <p className="text-ink-muted text-xs">{p.slug}</p>
+                          {(p.bullet_points?.length ?? 0) > 0 && (
+                            <p className="text-xs text-brand-600 mt-0.5">{p.bullet_points.length} bullet point{p.bullet_points.length !== 1 ? 's' : ''}</p>
+                          )}
                         </div>
                       </div>
                     </td>
                     <td className="px-5 py-3 font-semibold">${p.price.toFixed(2)}</td>
                     <td className="px-5 py-3 text-ink-secondary capitalize">{p.category || '—'}</td>
                     <td className="px-5 py-3">
-                      <span className={`px-2.5 py-1 rounded-xl text-xs font-medium ${
-                        p.stock_status === 'in_stock' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                      }`}>{p.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock'}</span>
+                      <span className={`px-2.5 py-1 rounded-xl text-xs font-medium ${p.stock_status === 'in_stock' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {p.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                      </span>
                     </td>
                     <td className="px-5 py-3">
                       {p.is_featured && <Star size={14} className="text-amber-400 fill-amber-400" />}
@@ -177,10 +213,7 @@ export default function AdminProducts() {
                   {(editing.images ?? []).map((img, i) => (
                     <div key={i} className="relative w-20 h-20 rounded-2xl overflow-hidden bg-surface-100 group">
                       <Image src={img} alt="" fill className="object-cover" />
-                      <button
-                        onClick={() => removeImage(i)}
-                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                      >
+                      <button onClick={() => removeImage(i)} className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                         <X size={14} className="text-white" />
                       </button>
                     </div>
@@ -197,11 +230,12 @@ export default function AdminProducts() {
                 <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleUpload} />
               </div>
 
+              {/* Basic fields */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Product Name *</label>
                   <input
-                    className="input" placeholder="Astronaut Galaxy Projector"
+                    className="input" placeholder="NebulaBot X8"
                     value={editing.name ?? ''}
                     onChange={e => setEditing(p => ({ ...p, name: e.target.value, slug: p.slug || slugify(e.target.value) }))}
                   />
@@ -209,7 +243,7 @@ export default function AdminProducts() {
                 <div>
                   <label className="label">Slug *</label>
                   <input
-                    className="input" placeholder="astronaut-galaxy-projector"
+                    className="input" placeholder="nebulabot-x8"
                     value={editing.slug ?? ''}
                     onChange={e => setEditing(p => ({ ...p, slug: slugify(e.target.value) }))}
                   />
@@ -267,16 +301,94 @@ export default function AdminProducts() {
                 </div>
               </div>
 
+              {/* Description */}
               <div>
                 <label className="label">Description</label>
                 <textarea
                   className="input min-h-[100px] resize-y"
-                  placeholder="Product description..."
+                  placeholder="Write a short overview of the product..."
                   value={editing.description ?? ''}
                   onChange={e => setEditing(p => ({ ...p, description: e.target.value }))}
                 />
               </div>
 
+              {/* ── BULLET POINTS ── */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="label mb-0">Key Features (Bullet Points)</label>
+                  <span className="text-xs text-ink-muted">{bullets.length} point{bullets.length !== 1 ? 's' : ''}</span>
+                </div>
+
+                {/* Existing bullets */}
+                {bullets.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {bullets.map((b, i) => (
+                      <div key={i} className="flex items-center gap-2 group">
+                        {/* Reorder buttons */}
+                        <div className="flex flex-col gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => moveBullet(i, -1)}
+                            disabled={i === 0}
+                            className="w-5 h-4 flex items-center justify-center text-ink-muted hover:text-ink-primary disabled:opacity-30 text-[10px]"
+                          >▲</button>
+                          <button
+                            onClick={() => moveBullet(i, 1)}
+                            disabled={i === bullets.length - 1}
+                            className="w-5 h-4 flex items-center justify-center text-ink-muted hover:text-ink-primary disabled:opacity-30 text-[10px]"
+                          >▼</button>
+                        </div>
+
+                        <GripVertical size={14} className="text-surface-300 shrink-0" />
+
+                        {/* Bullet icon */}
+                        <CheckCircle2 size={14} className="text-brand-500 shrink-0" />
+
+                        {/* Editable text */}
+                        <input
+                          className="flex-1 text-sm border border-surface-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent bg-surface-50 hover:bg-white transition-colors"
+                          value={b}
+                          onChange={e => editBullet(i, e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && bulletRef.current?.focus()}
+                        />
+
+                        {/* Delete */}
+                        <button
+                          onClick={() => removeBullet(i)}
+                          className="p-1.5 rounded-lg hover:bg-red-50 text-ink-muted hover:text-red-500 transition-colors shrink-0"
+                        >
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add new bullet */}
+                <div className="flex gap-2">
+                  <div className="flex-1 flex items-center gap-2 border border-dashed border-brand-300 bg-brand-50/50 rounded-xl px-3 py-2 focus-within:border-brand-500 focus-within:bg-white transition-colors">
+                    <Plus size={14} className="text-brand-500 shrink-0" />
+                    <input
+                      ref={bulletRef}
+                      type="text"
+                      className="flex-1 text-sm bg-transparent outline-none placeholder:text-ink-muted"
+                      placeholder="Add a feature e.g. 8 Projection Modes"
+                      value={newBullet}
+                      onChange={e => setNewBullet(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addBullet() } }}
+                    />
+                  </div>
+                  <button
+                    onClick={addBullet}
+                    disabled={!newBullet.trim()}
+                    className="btn-primary px-4 py-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Add
+                  </button>
+                </div>
+                <p className="text-xs text-ink-muted mt-1.5">Press Enter or click Add · Click any bullet to edit it · Use ▲▼ to reorder</p>
+              </div>
+
+              {/* Featured */}
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

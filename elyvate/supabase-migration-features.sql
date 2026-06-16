@@ -3,7 +3,7 @@
 -- Run in Supabase → SQL Editor → New Query
 -- =============================================
 
--- 1. Add tracking number + fulfillment fields to orders
+-- 1. Add tracking + fulfillment fields to orders
 alter table orders
   add column if not exists tracking_number   text default null,
   add column if not exists tracking_carrier  text default null,
@@ -23,11 +23,15 @@ create table if not exists reviews (
 );
 
 alter table reviews enable row level security;
--- Public can read approved reviews
+
 create policy "Public can read approved reviews"
   on reviews for select using (is_approved = true);
--- Anyone can submit a review
+
 create policy "Anyone can submit a review"
   on reviews for insert with check (true);
+
+-- 3. Bullet points on products
+alter table products
+  add column if not exists bullet_points text[] default array[]::text[];
 
 -- =============================================

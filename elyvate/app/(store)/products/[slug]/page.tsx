@@ -160,7 +160,23 @@ export default function ProductPage() {
                 <span>Estimated delivery: <strong>7–14 business days</strong></span>
               </div>
 
-              <p className="text-ink-secondary leading-relaxed mb-8">{product.description}</p>
+              <p className="text-ink-secondary leading-relaxed mb-6">{product.description}</p>
+
+              {/* Bullet points */}
+              {product.bullet_points && product.bullet_points.length > 0 && (
+                <div className="mb-8 space-y-2.5">
+                  {product.bullet_points.map((point, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                          <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span className="text-sm text-ink-secondary leading-relaxed">{point}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Qty + Add to cart */}
               <div className="flex items-center gap-4 mb-6">

@@ -1,3 +1,10 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Returns & Refunds — Elyvate',
+  description: '30-day hassle-free returns on all Elyvate products. Learn how to request a return or refund.',
+}
+
 export default function ReturnsPolicy() {
   return (
     <div className="section-pad pt-28 pb-20">

@@ -1,7 +1,13 @@
+import { Metadata } from 'next'
 import { supabase } from '@/lib/supabase'
 import ProductGrid from '@/components/store/ProductGrid'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: 'All Products — Elyvate',
+  description: 'Shop our full collection of ambient lighting and projection gadgets. Free worldwide shipping, 30-day returns.',
+}
 
 export default async function ProductsPage() {
   const { data: products } = await supabase

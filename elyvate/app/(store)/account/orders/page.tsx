@@ -6,6 +6,7 @@ import { Package, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react'
 import { useAuth } from '@/lib/authContext'
 import { supabaseBrowser } from '@/lib/supabase'
 import type { Order } from '@/lib/supabase'
+import { OrderListSkeleton } from '@/components/store/Skeletons'
 
 const statusStyle = (s: string) => {
   if (s === 'delivered') return 'bg-green-100 text-green-700'
@@ -38,8 +39,16 @@ export default function OrderHistoryPage() {
   }, [user, loading, router])
 
   if (loading || fetching) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+    <div className="section-pad pt-28 pb-20">
+      <div className="container-xl max-w-3xl">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-2 rounded-xl text-ink-secondary">
+            <ArrowLeft size={18} />
+          </div>
+          <h1 className="font-display text-3xl font-semibold text-ink-primary">Order History</h1>
+        </div>
+        <OrderListSkeleton count={3} />
+      </div>
     </div>
   )
 

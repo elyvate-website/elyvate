@@ -4,6 +4,7 @@ import { Search, X } from 'lucide-react'
 import { supabaseBrowser } from '@/lib/supabase'
 import type { Product } from '@/lib/supabase'
 import ProductCard from '@/components/store/ProductCard'
+import { ProductGridSkeleton } from '@/components/store/Skeletons'
 
 export default function SearchPage() {
   const [query, setQuery]       = useState('')
@@ -72,8 +73,8 @@ export default function SearchPage() {
 
         {/* Loading */}
         {loading && (
-          <div className="flex justify-center py-16">
-            <div className="w-7 h-7 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+          <div className="mt-2">
+            <ProductGridSkeleton count={6} />
           </div>
         )}
 

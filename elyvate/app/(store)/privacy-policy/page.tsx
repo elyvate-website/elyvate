@@ -1,3 +1,10 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy — Elyvate',
+  description: 'Learn how Elyvate collects, uses, and protects your personal information.',
+}
+
 export default function PrivacyPolicy() {
   return (
     <div className="section-pad pt-28 pb-20">

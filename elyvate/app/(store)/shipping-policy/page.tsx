@@ -1,3 +1,10 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Shipping Policy — Elyvate',
+  description: 'Learn about Elyvate\'s shipping times, costs, and order tracking. Free worldwide shipping on all orders.',
+}
+
 export default function ShippingPolicy() {
   return (
     <div className="section-pad pt-28 pb-20">

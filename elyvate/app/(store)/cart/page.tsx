@@ -60,24 +60,39 @@ export default function CartPage() {
             {/* Items */}
             <div className="lg:col-span-2 space-y-4">
               {items.map(item => (
-                <div key={item.id} className="card p-4 flex items-center gap-4">
-                  <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-surface-100 shrink-0">
-                    {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
+                <div key={item.id} className="card p-4">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-100 shrink-0">
+                      {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/products/${item.slug}`} className="font-semibold text-sm text-ink-primary hover:text-brand-600 line-clamp-2">
+                        {item.name}
+                      </Link>
+                      <p className="text-brand-600 font-bold mt-1">${item.price.toFixed(2)}</p>
+                    </div>
+                    {/* Qty + delete sit inline on desktop only */}
+                    <div className="hidden sm:flex items-center border border-surface-300 rounded-xl overflow-hidden shrink-0">
+                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">−</button>
+                      <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">+</button>
+                    </div>
+                    <button onClick={() => removeItem(item.id)} className="hidden sm:flex p-2 text-ink-muted hover:text-red-500 transition-colors shrink-0">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/products/${item.slug}`} className="font-semibold text-sm text-ink-primary hover:text-brand-600 line-clamp-2">
-                      {item.name}
-                    </Link>
-                    <p className="text-brand-600 font-bold mt-1">${item.price.toFixed(2)}</p>
+
+                  {/* Qty + delete drop to their own row on mobile */}
+                  <div className="flex sm:hidden items-center justify-between gap-3 mt-3 pt-3 border-t border-surface-100">
+                    <div className="flex items-center border border-surface-300 rounded-xl overflow-hidden shrink-0">
+                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">−</button>
+                      <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">+</button>
+                    </div>
+                    <button onClick={() => removeItem(item.id)} className="flex items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-red-500 transition-colors">
+                      <Trash2 size={14} /> Remove
+                    </button>
                   </div>
-                  <div className="flex items-center border border-surface-300 rounded-xl overflow-hidden shrink-0">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">−</button>
-                    <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-surface-100 text-sm">+</button>
-                  </div>
-                  <button onClick={() => removeItem(item.id)} className="p-2 text-ink-muted hover:text-red-500 transition-colors">
-                    <Trash2 size={16} />
-                  </button>
                 </div>
               ))}
             </div>

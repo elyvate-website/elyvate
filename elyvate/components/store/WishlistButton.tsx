@@ -1,5 +1,6 @@
 'use client'
 import { Heart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useWishlist } from '@/lib/wishlistStore'
 import { Product } from '@/lib/supabase'
 import toast from 'react-hot-toast'
@@ -11,14 +12,23 @@ type Props = {
 }
 
 // Reusable heart toggle button — used on ProductCard, ProductCardCompact,
-// and the product detail page. Keeps wishlist behavior consistent everywhere.
+// and the product detail page. Wishlist requires login: guests get
+// redirected to sign in instead of the action silently failing.
 export default function WishlistButton({ product, size = 16, className = '' }: Props) {
-  const { toggleItem, isWishlisted } = useWishlist()
+  const { toggleItem, isWishlisted, isLoggedIn } = useWishlist()
+  const router = useRouter()
   const active = isWishlisted(product.id)
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
+
+    if (!isLoggedIn) {
+      toast.error('Sign in to save favorites')
+      router.push('/account/login')
+      return
+    }
+
     toggleItem(product)
     toast.success(active ? 'Removed from wishlist' : 'Added to wishlist!')
   }

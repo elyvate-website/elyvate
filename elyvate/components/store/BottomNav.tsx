@@ -112,6 +112,7 @@ export default function BottomNav() {
 
   function getActiveHref(tab: typeof tabs[number]) {
     if (tab.isAccount) return user ? '/account' : '/account/login'
+    if (tab.isWishlist && !user) return '/account/login'
     return tab.href
   }
 

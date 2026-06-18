@@ -2,13 +2,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Heart, ShoppingCart, X, ArrowRight } from 'lucide-react'
+import { Heart, ShoppingCart, X, ArrowRight, LogIn } from 'lucide-react'
 import { useWishlist } from '@/lib/wishlistStore'
 import { useCart } from '@/lib/cartStore'
 import toast from 'react-hot-toast'
 
 export default function WishlistPage() {
-  const { items, removeItem } = useWishlist()
+  const { items, removeItem, loading, isLoggedIn } = useWishlist()
   const { addItemMinimal } = useCart()
   const [moving, setMoving] = useState<string | null>(null)
 
@@ -31,6 +31,26 @@ export default function WishlistPage() {
       setMoving(null)
     }, 300)
   }
+
+  // Logged-out state — wishlist is account-bound, so guests need to sign in first
+  if (!loading && !isLoggedIn) return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 section-pad pt-28 pb-20">
+      <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center">
+        <Heart size={28} className="text-brand-600" />
+      </div>
+      <h2 className="font-display text-2xl text-ink-primary text-center">Sign in to see your favorites</h2>
+      <p className="text-ink-secondary text-sm text-center max-w-xs">Your wishlist is saved to your account, so it follows you across any device you log into.</p>
+      <Link href="/account/login" className="btn-primary flex items-center gap-2">
+        <LogIn size={16} /> Sign In
+      </Link>
+    </div>
+  )
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   if (items.length === 0) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 section-pad pt-28 pb-20">

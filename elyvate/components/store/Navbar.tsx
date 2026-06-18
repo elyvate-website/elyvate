@@ -76,7 +76,7 @@ export default function Navbar() {
           <Link href="/products" className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
             Products
           </Link>
-          <Link href="/wishlist" className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
+          <Link href={user ? '/wishlist' : '/account/login'} className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
             Favorites
           </Link>
         </div>

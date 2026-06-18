@@ -35,3 +35,31 @@ alter table products
   add column if not exists bullet_points text[] default array[]::text[];
 
 -- =============================================
+
+-- =============================================
+-- Wishlist — tied to logged-in user, synced across devices
+-- =============================================
+create table if not exists wishlist_items (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  product_id  uuid not null references products(id) on delete cascade,
+  created_at  timestamptz default now(),
+  unique (user_id, product_id)
+);
+
+alter table wishlist_items enable row level security;
+
+-- Users can only read their own wishlist
+create policy "Users can read own wishlist"
+  on wishlist_items for select
+  using (auth.uid() = user_id);
+
+-- Users can only add to their own wishlist
+create policy "Users can insert own wishlist items"
+  on wishlist_items for insert
+  with check (auth.uid() = user_id);
+
+-- Users can only delete their own wishlist items
+create policy "Users can delete own wishlist items"
+  on wishlist_items for delete
+  using (auth.uid() = user_id);

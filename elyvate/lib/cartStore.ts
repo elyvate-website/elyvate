@@ -15,6 +15,7 @@ export type CartItem = {
 type CartStore = {
   items: CartItem[]
   addItem: (product: Product) => void
+  addItemMinimal: (item: { id: string; name: string; price: number; image: string; slug: string }) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
@@ -46,6 +47,23 @@ export const useCart = create<CartStore>()(
               slug: product.slug,
             }],
           }
+        })
+      },
+
+      // Lightweight variant used when only minimal item data is available,
+      // e.g. moving an item from the wishlist (which doesn't store every
+      // Product field) into the cart.
+      addItemMinimal: (item) => {
+        set((state) => {
+          const existing = state.items.find(i => i.id === item.id)
+          if (existing) {
+            return {
+              items: state.items.map(i =>
+                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+              ),
+            }
+          }
+          return { items: [...state.items, { ...item, quantity: 1 }] }
         })
       },
 

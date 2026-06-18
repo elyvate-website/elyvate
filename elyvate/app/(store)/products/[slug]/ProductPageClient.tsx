@@ -6,6 +6,7 @@ import { Star, ShoppingCart, Truck, ShieldCheck, RefreshCw, Headphones, ZoomIn, 
 import { supabase } from '@/lib/supabase'
 import type { Product } from '@/lib/supabase'
 import { useCart } from '@/lib/cartStore'
+import WishlistButton from '@/components/store/WishlistButton'
 import toast from 'react-hot-toast'
 
 type Review = { id: string; author_name: string; rating: number; body: string; created_at: string }
@@ -182,8 +183,8 @@ export default function ProductPageClient({ slug, initialProduct }: { slug: stri
               )}
 
               {/* Qty + Add to cart */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center border border-surface-300 rounded-2xl overflow-hidden">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center border border-surface-300 rounded-2xl overflow-hidden shrink-0">
                   <button onClick={() => setQty(q => Math.max(1, q - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-surface-100 transition-colors text-ink-primary font-medium text-lg">−</button>
                   <span className="w-10 text-center text-sm font-semibold">{qty}</span>
                   <button onClick={() => setQty(q => q + 1)} className="w-11 h-12 flex items-center justify-center hover:bg-surface-100 transition-colors text-ink-primary font-medium text-lg">+</button>
@@ -191,11 +192,12 @@ export default function ProductPageClient({ slug, initialProduct }: { slug: stri
                 <button
                   ref={mainBtnRef}
                   onClick={handleAddToCart}
-                  className={`btn-primary flex-1 flex items-center justify-center gap-2 py-4 transition-all ${added ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                  className={`btn-primary flex-1 min-w-0 flex items-center justify-center gap-2 py-4 transition-all ${added ? 'bg-green-600 hover:bg-green-700' : ''}`}
                 >
                   <ShoppingCart size={16} />
                   {added ? 'Added!' : 'Add to Cart'}
                 </button>
+                <WishlistButton product={product} size={18} className="w-12 h-12 border border-surface-300 shrink-0" />
               </div>
 
               {/* Trust badges grid */}

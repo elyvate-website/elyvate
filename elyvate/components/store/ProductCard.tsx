@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Star, ShoppingCart } from 'lucide-react'
 import { Product } from '@/lib/supabase'
 import { useCart } from '@/lib/cartStore'
+import WishlistButton from './WishlistButton'
 import toast from 'react-hot-toast'
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -32,6 +33,7 @@ export default function ProductCard({ product }: { product: Product }) {
               SALE
             </span>
           )}
+          <WishlistButton product={product} size={15} className="absolute top-3 right-3 w-8 h-8 shadow-card" />
         </div>
 
         {/* Info */}

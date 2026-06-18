@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Star } from 'lucide-react'
 import { Product } from '@/lib/supabase'
+import WishlistButton from './WishlistButton'
 
 export default function ProductCardCompact({ product }: { product: Product }) {
   const img = product.images?.[0] ?? '/placeholder.png'
@@ -23,6 +24,7 @@ export default function ProductCardCompact({ product }: { product: Product }) {
             SALE
           </span>
         )}
+        <WishlistButton product={product} size={14} className="absolute top-3 right-3 w-7 h-7 shadow-card" />
       </div>
 
       <h3 className="text-sm font-semibold text-ink-primary leading-snug mb-1 break-words [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">

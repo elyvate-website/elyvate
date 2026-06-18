@@ -2,12 +2,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { ShoppingCart, User, LogOut, Package, ChevronDown, Menu, X } from 'lucide-react'
+import { ShoppingCart, Search, User, LogOut, Package, ChevronDown, Menu, X } from 'lucide-react'
 import { useCart } from '@/lib/cartStore'
 import { useAuth } from '@/lib/authContext'
 
 // Pages where navbar is always solid (no transparent hero)
-const SOLID_PAGES = ['/products', '/search', '/cart', '/checkout', '/account', '/track-order', '/contact', '/shipping-policy', '/returns-policy', '/privacy-policy']
+const SOLID_PAGES = ['/products', '/search', '/wishlist', '/cart', '/checkout', '/account', '/track-order', '/contact', '/shipping-policy', '/returns-policy', '/privacy-policy']
 
 export default function Navbar() {
   const [scrolled, setScrolled]        = useState(false)
@@ -76,13 +76,23 @@ export default function Navbar() {
           <Link href="/products" className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
             Products
           </Link>
-          <Link href="/search" className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
-            Search
+          <Link href="/wishlist" className={`text-sm transition-colors ${light ? 'text-ink-secondary hover:text-ink-primary' : 'text-white/80 hover:text-white'}`}>
+            Favorites
           </Link>
         </div>
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+
+          {/* Search — now lives in the top bar on all screen sizes since mobile bottom nav uses that slot for Favorites */}
+          <Link
+            href="/search"
+            className={`p-2 rounded-xl transition-colors ${
+              light ? 'hover:bg-surface-100 text-ink-primary' : 'hover:bg-white/10 text-white'
+            }`}
+          >
+            <Search size={20} />
+          </Link>
 
           {/* Cart — visible on all screen sizes in top bar */}
           <Link

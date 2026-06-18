@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl     = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -7,8 +7,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Browser client — singleton, keeps auth session in localStorage
-let _browserClient: ReturnType<typeof createClient> | null = null
-export function supabaseBrowser() {
+let _browserClient: SupabaseClient | null = null
+export function supabaseBrowser(): SupabaseClient {
   if (!_browserClient) {
     _browserClient = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {

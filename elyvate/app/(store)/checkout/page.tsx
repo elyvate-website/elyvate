@@ -113,13 +113,13 @@ export default function CheckoutPage() {
         <h1 className="font-display text-3xl font-semibold mb-10">Checkout</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Contact */}
               <div className="card p-6">
                 <h2 className="font-semibold text-lg mb-5">Contact Information</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="label">Full Name</label>
                     <input required className="input" placeholder="John Doe" value={form.name} onChange={update('name')} />
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
               {/* Shipping */}
               <div className="card p-6">
                 <h2 className="font-semibold text-lg mb-5">Shipping Address</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
                     <label className="label">Street Address</label>
                     <input required className="input" placeholder="123 Main St, Apt 4" value={form.address} onChange={update('address')} />

@@ -71,7 +71,7 @@ export default function AdminHero() {
     <div>
       <h1 className="font-display text-2xl font-semibold mb-8">Hero Section</h1>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-card p-6 space-y-5">
           <div>

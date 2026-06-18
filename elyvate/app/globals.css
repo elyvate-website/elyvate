@@ -19,6 +19,14 @@
   h1, h2, h3 {
     @apply font-display;
   }
+
+  /* CSS Grid items default to min-width: auto, which lets long text or
+     fixed-width children force the grid track wider than its container.
+     This resets that default everywhere so grid children always respect
+     their parent's width and wrap/shrink properly instead of overflowing. */
+  .grid > * {
+    min-width: 0;
+  }
 }
 
 @layer components {

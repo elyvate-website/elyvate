@@ -56,11 +56,11 @@ export default function CartPage() {
         <div className="container-xl">
           <h1 className="font-display text-3xl font-semibold mb-10">Your Cart</h1>
 
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 min-w-0">
             {/* Items */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-4 min-w-0 w-full">
               {items.map(item => (
-                <div key={item.id} className="card p-4">
+                <div key={item.id} className="card p-4 min-w-0 w-full">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-100 shrink-0">
                       {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
@@ -98,7 +98,7 @@ export default function CartPage() {
             </div>
 
             {/* Summary */}
-            <div className="card p-6 h-fit sticky top-24">
+            <div className="card p-6 h-fit sticky top-24 min-w-0 w-full">
               <h2 className="font-display text-xl font-semibold mb-6">Order Summary</h2>
               <div className="space-y-3 mb-6">
                 {items.map(item => (

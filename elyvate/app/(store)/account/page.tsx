@@ -56,7 +56,7 @@ export default function AccountPage() {
         </div>
 
         {/* Quick links */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <Link href="/account/orders" className="card p-5 flex items-center gap-4 hover:border-brand-200 group">
             <div className="w-11 h-11 bg-brand-50 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
               <Package size={20} className="text-brand-600" />

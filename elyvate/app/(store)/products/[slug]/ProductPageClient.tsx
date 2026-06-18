@@ -109,7 +109,7 @@ export default function ProductPageClient({ slug, initialProduct }: { slug: stri
             <span className="text-ink-primary">{product.name}</span>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 xl:gap-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
             {/* ── Images ── */}
             <div className="space-y-4">
               <div
@@ -270,7 +270,7 @@ export default function ProductPageClient({ slug, initialProduct }: { slug: stri
                 <p className="text-ink-muted text-sm">No reviews yet. Be the first to review this product!</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {reviews.map(r => (
                   <div key={r.id} className="card p-5">
                     <div className="flex items-center justify-between mb-2">

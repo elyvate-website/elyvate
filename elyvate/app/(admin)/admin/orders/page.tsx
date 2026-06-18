@@ -142,7 +142,7 @@ export default function AdminOrders() {
                 {/* Expanded panel */}
                 {isOpen && (
                   <div className="border-t border-surface-200 bg-surface-50 p-5 space-y-6">
-                    <div className="grid sm:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                       {/* Customer */}
                       <div>
                         <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2">Customer</p>
@@ -205,7 +205,7 @@ export default function AdminOrders() {
                           </div>
                         ) : null}
 
-                        <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                           <div>
                             <label className="label text-xs">Tracking Number *</label>
                             <input className="input text-sm font-mono" placeholder="e.g. DHL1234567890" value={form.tracking_number} onChange={e => setForm(o.id, { tracking_number: e.target.value })} />

@@ -231,7 +231,7 @@ export default function AdminProducts() {
               </div>
 
               {/* Basic fields */}
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label">Product Name *</label>
                   <input

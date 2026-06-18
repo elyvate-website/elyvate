@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   title: 'Elyvate — Elevate Your Space',
   description: 'Premium ambient lighting and projection gadgets for your home.',
   icons: { icon: '/favicon.ico' },
+}
+
+// CRITICAL: without this, mobile browsers default to a ~980px desktop
+// viewport and scale the entire page down to fit — which is what was
+// causing every card and bar to look "cut off" on the right edge.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

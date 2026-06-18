@@ -65,8 +65,8 @@ export default function CartPage() {
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-100 shrink-0">
                       {item.image && <Image src={item.image} alt={item.name} fill className="object-cover" />}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/products/${item.slug}`} className="font-semibold text-sm text-ink-primary hover:text-brand-600 line-clamp-2">
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <Link href={`/products/${item.slug}`} className="font-semibold text-sm text-ink-primary hover:text-brand-600 break-words [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">
                         {item.name}
                       </Link>
                       <p className="text-brand-600 font-bold mt-1">${item.price.toFixed(2)}</p>

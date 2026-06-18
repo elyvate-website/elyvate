@@ -25,7 +25,7 @@ export default function ProductCardCompact({ product }: { product: Product }) {
         )}
       </div>
 
-      <h3 className="text-sm font-semibold text-ink-primary leading-snug line-clamp-2 mb-1">
+      <h3 className="text-sm font-semibold text-ink-primary leading-snug mb-1 break-words [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden">
         {product.name}
       </h3>
 

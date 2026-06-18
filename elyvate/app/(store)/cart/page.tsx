@@ -16,9 +16,25 @@ export default function CartPage() {
   const router = useRouter()
   const [showAuthModal, setShowAuthModal] = useState(false)
 
+  function fireCheckoutIntentEmail() {
+    // Fire-and-forget — never await this or block navigation on it.
+    // This is just a "heads up" notification, not critical to the purchase flow.
+    fetch('/api/checkout/intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+        total: total(),
+        customerEmail: user?.email ?? null,
+      }),
+    }).catch(() => { /* silently ignore — never disrupt the customer */ })
+  }
+
   function handleCheckoutClick() {
     // If auth is still loading, wait
     if (loading) return
+    // Notify admin immediately that someone is checking out — before any form is filled
+    fireCheckoutIntentEmail()
     // If already logged in, go straight to checkout
     if (user) { router.push('/checkout'); return }
     // Otherwise show the popup
